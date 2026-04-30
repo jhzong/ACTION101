@@ -1,0 +1,82 @@
+:root {
+  --bg-color: #1a253bff;
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --neon-blue: #00f2ff;
+  --border-color: rgba(0, 242, 255, 0.2);
+  background: linear-gradient(180deg, #0d1535 0%, #0a1228 60%, #060d1e 100%);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;;  
+  background-color: var(--bg-color);
+  color: white;
+  font-family: 'Pretendard', sans-serif;
+  overflow-x: hidden; 
+  overflow-y: auto;
+}
+
+/* 전체 컨테이너: 배경에 강렬한 레이저 광선 효과 추가 */
+.main-container {
+  /* position: relative;   */
+  /* display: flex; */
+  flex-direction: column;
+  min-height: 100vh;
+  height:100%;
+  /* padding: 20px; */
+  /* gap: 100px; */
+  /* 사진과 같은 딥블루 + 퍼플 톤의 그라데이션 */
+  background: 
+    /* radial-gradient(circle at 50% 0%, rgba(0, 242, 255, 0.15) 0%, transparent 50%), */
+    /* radial-gradient(circle at center, #1a2c4e 0%, #0d1321 100%) fixed; */
+    linear-gradient(180deg, #0d1535 0%, #0a1228 60%, #060d1e 100%);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  /* overflow: hidden; */
+}
+
+/* 배경 뒤에 깔리는 날카로운 레이저 빔 효과 */
+.main-container::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: 
+    repeating-linear-gradient(45deg, transparent 0, transparent 150px, rgba(0, 242, 255, 0.03) 151px, transparent 152px),
+    repeating-linear-gradient(-45deg, transparent 0, transparent 150px, rgba(255, 255, 255, 0.03) 151px, transparent 152px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/*-----------------------------------------------------------------------------------*/
+/* 사진 속 예시처럼 강렬한 광원 효과로 수정 */
+.bg-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* 중앙 강렬한 스포트라이트 (사진의 핵심) */
+/* .bg-glow::before {
+  content: '';
+  position: absolute;
+  top: -10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60vw;
+  height: 120vh;
+  background: conic-gradient(
+    from 150deg at 50% 0%, 
+    transparent 0deg,
+    rgba(255, 255, 255, 0.25) 25deg, 
+    rgba(0, 242, 255, 0.15) 30deg,
+    transparent 60deg
+  );
+  filter: blur(40px);
+  animation: main-spotlight 6s infinite ease-in-out;
+} */
+

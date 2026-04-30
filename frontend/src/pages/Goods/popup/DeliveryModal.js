@@ -1,0 +1,118 @@
+import React, { useState, useRef } from "react";
+import styles from "./DeliveryModal.module.css";
+import { SaveInput } from "../../../components/input/Input";
+import { SearchBtn } from "../../../components/button/Button";
+import DaumAddrSearchModal from "../../../components/DaumAddrModal/DaumAddrModal";
+import { GoodsOrderApi } from "../GoodsApi";
+
+const DeliveryModal = ({ isOpen, onClose, totalPrice, goods, count }) => {
+    //다음 주소찾기
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [address, setAddress] = useState(""); // 주소 상태 관리
+    const formRef = useRef();
+
+    if (!isOpen) return null;
+
+    // 주소 검색 버튼을 눌렀을 때 DaumAddrSearchModal을 여는 함수
+    const handleAddressSearch = () => {
+        setIsModalOpen(true);
+    };
+
+    // 주소 선택이 완료되었을 때 실행되는 함수
+    const handleAddressComplete = (data) => {
+        setAddress(data.address || data); 
+        setIsModalOpen(false); // 주소 선택 후 모달 닫기
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(e.currentTarget);
+        // 서버의 GoodsOrdersDto 구조와 맞춤
+        const orderRequest = {
+            goods: goods, // 예시
+            totalPrice: totalPrice,
+            cnt: count,
+            receiverName: formData.get("receiverName"),
+            receiverPhone: formData.get("receiverPhone"),
+            address: address, // Daum 주소 검색 결과
+            detailAddress: formData.get("detailAddress"),
+            orderRequest: formData.get("orderRequest"),
+            paymentMethod: "KAKAO_PAY" // 결제 수단 추가
+        };
+        if(window.confirm("상품을 구매하시겠습니까?")) {
+            alert("결제 페이지로 이동합니다.");
+            GoodsOrderApi(orderRequest).then((res) => {
+                if (res.data.success) {
+                    if (res.data.next_redirect_pc_url) {
+                        // 카카오 결제 시 세션 관리가 필요할 수 있으므로 tid를 세션스토리지에 잠시 저장
+                        sessionStorage.setItem("tid", res.data.tid);
+                        
+                        // 결제창으로 이동
+                        window.location.href = res.data.next_redirect_pc_url;
+                        //카톡 useNavigate는 안됨
+                        //onClose();
+                    }
+                }
+            });
+        }
+    };
+
+    return (
+        <div className={styles.modalOverlay} onClick={(e) => e.target === e.currentTarget && onClose()}>
+            <div className={styles.modalContent}>
+                <h2 className={styles.title}>배송 정보 입력</h2>
+                <form ref={formRef} onSubmit={handleSubmit} className={styles.form}>
+                <div className={styles.inputGroup}>
+                    <label><span className={styles.required}>*</span> 받는 사람</label>
+                    <SaveInput name="receiverName" maxLength="50" placeholder="이름을 입력하세요" required />
+                </div>
+                <div className={styles.inputGroup}>
+                    <label><span className={styles.required}>*</span> 연락처</label>
+                    <SaveInput name="receiverPhone" 
+                    maxLength="13"
+                    onInput={(e) => {
+                        e.target.value = e.target.value
+                            .replace(/[^0-9]/, '')
+                            .replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`)
+                    }} placeholder="010-0000-0000" required />
+                </div>
+                <div className={styles.inputGroup}>
+                    <label><span className={styles.required}>*</span> 배송 주소</label>
+                    <div className={styles.addressRow}>
+                    <SaveInput 
+                        placeholder="주소를 검색하세요" 
+                        value={address} 
+                        readOnly 
+                        className={styles.flex1} 
+                    />
+                    <SearchBtn type="button" onClick={handleAddressSearch}>주소 검색</SearchBtn>
+                    </div>
+                    <SaveInput name="detailAddress" maxLength="255" placeholder="상세 주소를 입력하세요" required />
+                </div>
+                <div className={styles.inputGroup}>
+                    <label>배송 요청사항</label>
+                    <SaveInput name="orderRequest" maxLength="255" placeholder="예: 문 앞에 놓아주세요" />
+                </div>
+                <div className={styles.paymentBox}>
+                    <p>최종 결제 금액 : <span>{totalPrice.toLocaleString()}원</span></p>
+                    {/* <p style={{fontSize:'12px'}}>※ 제주도 외 기타 도서지역은 배송비가 추가로 청구될 수 있습니다.</p> */}
+                    {/* 추가배송비는 사용자가 입력가능하게 진행(카카오 페이 결제취소시 수수료 반환) */}
+                    {/* 한 컬럼에 json형태로 저장이나 상세정보처럼 위지윅으로 산간지역 테이블이나 이미지로 보여주기 상품등록시 산간지역 배송가능한지 체크 json은 테이블만 가능하며 자동계산이 가능한지 고려(일단 기능X) */}
+                </div>
+                <div className={styles.actionButtons}>
+                    <button type="submit" className={styles.completeBtn}>주문완료</button>
+                    <button type="button" className={styles.closeBtn} onClick={onClose}>취소</button>
+                </div>
+                </form>
+                <DaumAddrSearchModal
+                    isOpen={isModalOpen} 
+                    onClose={() => setIsModalOpen(false)} 
+                    onComplete={handleAddressComplete} 
+                />
+            </div>
+        </div>
+    );
+};
+
+export default DeliveryModal;

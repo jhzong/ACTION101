@@ -1,0 +1,53 @@
+/* 읽기 전용 콘텐츠 박스 (textarea 대신 div 사용 시) */
+.readonly-content-box {
+    min-height: 150px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border: 1px solid #e4e7ed;
+    border-radius: 4px;
+    color: #333;
+    line-height: 1.6;
+    white-space: pre-wrap; /* 줄바꿈 유지 */
+}
+
+/* 하단 버튼 배치 */
+.detail-btn-area {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding-bottom: 50px;
+}
+
+/* 입력창 포커스 효과 */
+#answerContent:focus {
+    border-color: #1a2c4e;
+    outline: none;
+    box-shadow: 0 0 5px rgba(26, 44, 78, 0.1);
+}
+
+/* 섹션 간 간격 확보 */
+.dashboard-card { margin-bottom: 25px; }
+
+/* 수동 입력 박스 전용 스타일 */
+.manual-search-box {
+    background-color: #f0f7ff; /* 연한 파란색 배경으로 강조 */
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px dashed #409eff; /* 점선 테두리로 '도구' 느낌 부여 */
+    margin: 15px 0; /* 상하 여백 */
+}
+
+.manual-search-box label {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.input-styled {
+    padding: 6px 10px;
+    border: 1px solid #dcdfe6;
+    border-radius: 4px;
+    outline: none;
+}
+
+.input-styled:focus { border-color: #409eff; }

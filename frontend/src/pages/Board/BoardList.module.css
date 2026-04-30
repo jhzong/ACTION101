@@ -1,0 +1,222 @@
+/* 컨테이너 및 타이틀 */
+.neonBoardContainer {
+    margin: 0 auto;
+    padding: 5px 20px;
+    font-family: 'Pretendard', sans-serif;
+    color: #e8f4f8;
+}
+
+.titleSection h2 {
+    color: #e2e8f0;
+    font-size: 1.6rem;
+    margin-bottom: 25px;
+}
+
+/* 2. 상단 가이드 바 (요청하신 이전 스타일) */
+.topGuideSection {
+    background: rgba(0, 242, 255, 0.03);
+    border: 1px solid rgba(0, 242, 255, 0.15);
+    border-radius: 16px;
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.guideTitle h3 {
+    color: #00f2ff;
+    font-size: 1.1rem;
+    margin: 0 0 4px 0;
+}
+
+.guideTitle p {
+    color: #94a3b8;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.guideList {
+    display: flex;
+    gap: 15px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.guideList li {
+    font-size: 0.85rem;
+    color: #cbd5e1;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 8px 18px;
+    border-radius: 30px; /* 둥근 배지 형태 */
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* 검색 영역 전체 컨테이너 */
+.searchSection {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 40px;
+    width: 100%;
+}
+
+/* 모든 검색 요소들을 감싸는 그룹 (높이 통일의 핵심) */
+.searchGroup {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* 요소 사이 간격 */
+    height: 45px; /* 전체 높이 고정 */
+}
+
+/* SelectBox 높이 강제 맞춤 (SearchSelect에 className이나 style 전달이 안 될 경우 대비) */
+.searchGroup :global(.select-box-container) { 
+    height: 100% !important;
+}
+/* 만약 SearchSelect가 내부적으로 select 태그를 쓴다면 */
+.searchGroup select {
+    height: 100%;
+}
+
+.searchForm {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+    max-width: 600px;
+}
+
+/* 검색어 입력창 래퍼 */
+.searchInputWrapper {
+    position: relative;
+    height: 100%; /* 부모 45px 상속 */
+    display: flex;
+    align-items: center;
+}
+
+.searchIcon {
+    position: absolute;
+    left: 15px;
+    width: 18px;
+    height: 18px;
+    z-index: 10;
+    pointer-events: none;
+    /* 아이콘 색상을 더 밝게 강조 */
+    filter: drop-shadow(0 0 2px rgba(0, 242, 255, 0.5));
+}
+
+/* 스타일의 밝고 선명한 인풋창 */
+.mainInput {
+    height: 98%;
+    width: 350px; /* 원하는 너비로 조절 */
+    padding: 0 15px 0 45px; /* 아이콘 공간 확보 */
+    /* 배경색을 기존보다 밝게 (N 스타일) */
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(0, 242, 255, 0.3);
+    border-radius: 8px;
+    color: #e2e8f0;
+    font-size: 15px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.mainInput:focus {
+    border-color: #00f2ff;
+    box-shadow: 0 0 8px rgba(0, 242, 255, 0.2);
+}
+
+.mainInput::placeholder {
+    color: rgba(232, 244, 248, 0.4);
+}
+
+/* 검색 버튼 - 높이와 스타일 맞춤 */
+.searchBtn {
+    height: 100%;
+    padding: 0 25px;
+    background: transparent;
+    border: 1px solid #00f2ff;
+    color: #00f2ff;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.searchBtn:hover {
+    background: rgba(0, 242, 255, 0.1);
+    box-shadow: 0 0 12px rgba(0, 242, 255, 0.2);
+}
+
+/* 4. 리스트 정보 */
+.listInfo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.highlight {
+    color: #00f2ff;
+    font-weight: 800;
+}
+
+/* 5. 테이블 */
+.tableWrapper {
+    background: rgba(0, 242, 255, 0.02);
+    border: 1px solid rgba(0, 242, 255, 0.15);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 25px;
+}
+
+.neonTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.neonTable thead th {
+    background: rgba(0, 242, 255, 0.06);
+    color: #00f3ff;
+    padding: 18px;
+    border-bottom: 1px solid rgba(0, 242, 255, 0.15);
+}
+
+.neonTable tbody td {
+    padding: 16px;
+    text-align: center;
+    border-bottom: 1px solid rgba(0, 242, 255, 0.05);
+}
+
+.textStart { text-align: left !important; padding-left: 30px !important; }
+.neonLink { color: #e8f4f8; text-decoration: none; }
+.neonLink:hover { color: #00f2ff; }
+
+/* 6. 하단 섹션 (페이지네이션 + 우측 버튼) */
+.bottomSection {
+    display: flex;
+    justify-content: center; /* 페이지네이션 중앙 정렬을 위해 */
+    align-items: center;
+    position: relative; /* 버튼 절대 위치 지정을 위해 */
+    margin-top: 20px;
+}
+
+.writeBtn {
+    position: absolute;
+    right: 0;
+    padding: 12px 25px;
+    background: #00f2ff;
+    border: none;
+    border-radius: 10px;
+    color: #0f172a;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
+    transition: all 0.2s;
+}
+
+.writeBtn:hover {
+    box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+    transform: translateY(-2px);
+}

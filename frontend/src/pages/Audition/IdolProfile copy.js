@@ -1,0 +1,432 @@
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import "./IdolProfile.css";
+import axios from "axios"; 
+import { IdolViewVoteApi, getIdolProfileApi } from "./idolApi";
+import { getVideoPageApi } from "../Video/MVideoApi";
+import axiosInstance from "../../api/axiosInstance";
+
+// 임시 데이터 (스토리보드 및 손그림 기반)
+const API_URL = process.env.REACT_APP_API_URL;
+const IDOL_DATA = {
+  profile: {
+    name: "로딩 중...", // {name} 에러 수정: 초기 텍스트로 변경
+    nameEn: "NAKAMARU AJU",
+    birth: "2008/01/21",
+    height: 170,
+    mbti: "ESFJ",
+    hobby: "동영상 편집, 계획 세우기",
+    keyword: "NICE",
+    // mainImgUrl: "https://via.placeholder.com/150x200", 
+    votes: { rank: "-", current: 0 },
+  },
+  photos: [
+    { id: 1, url: "/default_profile.png", desc: "컨셉 포토 1" }, // 외부 링크 대신 내부 경로로!
+    { id: 2, url: "/default_profile.png", desc: "컨셉 포토 2" },
+    { id: 3, url: "/default_profile.png", desc: "연습실 셀카" },
+    { id: 4, url: "/default_profile.png", desc: "무대 비하인드" },
+  ],
+  videos: [
+    { id: 1, title: "추천 카메라", thumb: "/default_profile.png" },
+    { id: 2, title: "1 MIN PR", thumb: "/default_profile.png" },
+    { id: 3, title: "연습 직캠 영상", thumb: "/default_profile.png" },
+    { id: 4, title: "비하인드 & 인터뷰", thumb: "/default_profile.png" },
+  ],
+};
+
+
+/* --- [채팅방] 컴포넌트 --- */
+function ChatRoom() {
+  const [chats] = useState([
+    { id: 1, user: "팬A", msg: "혼수야 데뷔하자! 💙" },
+    { id: 2, user: "국프B", msg: "오늘 무대 최고였어 ㅠㅠ" },
+    { id: 3, user: "AJU_LOVE", msg: "투표 완료! 1등 가즈아" },
+  ]);
+
+  return (
+    <div className="id-chat-room">
+      <h4 className="id-chat-title">실시간 팬채팅</h4>
+      <div className="id-chat-list">
+        {chats.map(c => (
+          <p key={c.id} className="id-chat-item">
+            <span>{c.user}</span>: {c.msg}
+          </p>
+        ))}
+      </div>
+      <div className="id-chat-input">
+        <input type="text" placeholder="응원 메시지 입력..." />
+        <button>전송</button>
+      </div>
+    </div>
+  );
+}
+
+/* --- [메인 페이지] --- */
+export default function IdolDetail() {
+
+  const navigate = useNavigate();
+  const { id } = useParams(); 
+  
+  const [idol, setIdol] = useState(IDOL_DATA); 
+  const [loading, setLoading] = useState(true);
+
+  // ✅ 안전하게 수정 (user가 있을 때만 role을 읽고 소문자로 변환)
+  const { user } = useAuth();
+
+// ✅ 아래 로그를 추가해서 브라우저 콘솔(F12)을 확인해보세요!
+  console.log("현재 로그인한 유저 정보:", user);
+  console.log("유저의 권한(role):", user?.role);
+  // 콘솔에서 'role' 대신 어떤 이름으로 데이터가 들어오는지 확인 필수!
+console.log("실제 유저 데이터 구조:", user);
+
+  const userRole = user?.role?.toLowerCase();
+
+  // 2. tempFiles: 업로드 대기 중인 파일 (스크린샷에 있던 변수)
+  const [tempFiles, setTempFiles] = useState([]);
+
+  // 3. handleTempDelete: 취소 버튼 클릭 시 실행될 함수
+  const handleTempDelete = () => {
+    setTempFiles([]); // 임시 파일 목록 비우기
+    const fileInput = document.getElementById("tempUpload");
+    if (fileInput) fileInput.value = "";
+  };
+
+
+  // 1. 사진 삭제 기능 (실제 서버 연동)
+  const handleImageDelete = async () => {
+    if (!window.confirm("정말 프로필 사진을 삭제하시겠습니까?")) return;
+
+    try {
+      // 서버의 삭제 API 호출 (경로는 프로젝트 API 명세에 맞춰 확인 필요)
+      await axiosInstance.delete(`http://localhost:8181/api/idolProfile/deleteImage/${id}`);
+      
+      alert("사진이 삭제되었습니다.");
+      
+      // 화면에서 이미지 제거 (상태 업데이트)
+      setIdol(prev => ({
+        ...prev,
+        profile: { ...prev.profile, mainImgUrl: null }
+      }));
+    } catch (error) {
+      console.error("삭제 실패:", error);
+      alert("사진 삭제 중 오류가 발생했습니다.");
+    }
+  };
+
+  // 2. 사진 등록 기능 (업로드 후 즉시 반영)
+  const handleImageUpload = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append("image", file);
+  formData.append("idolProfileId", id);
+
+  try {
+    const response = await axiosInstance.post(
+      "http://localhost:8181/api/idolProfile/uploadImage",
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } }
+    );
+
+    // 서버가 단순히 파일명 문자열(예: "1.jpg")만 보낸다고 가정할 때
+    const newFileName = response.data; 
+    alert("사진이 등록되었습니다!");
+
+    // ✅ 캐시 방지를 위해 뒤에 ?t=시간값을 붙여줍니다.
+   setTimeout(() => {
+      window.location.reload(); // 가장 확실한 방법은 페이지 전체 새로고침입니다.
+    }, 500);
+
+  } catch (error) {
+    console.error("업로드 실패:", error);
+    alert("사진 업로드에 실패했습니다.");
+  }
+};
+
+  
+  useEffect(() => {
+    if (!id) return;
+  const fetchIdolData = async () => {
+    try {
+      setLoading(true);
+      const response = await getIdolProfileApi(id); 
+      // 1. 서버가 보내준 생 데이터를 눈으로 직접 확인 (매우 중요!)
+      console.log("=== 서버 응답 형태 확인 ===");
+      console.log(response.data); 
+      console.log("지금 idol 상태의 photos 내용:", idol.photos);
+      // 서버에서 Map.put("profile", ...)과 Map.put("mediaList", ...)로 보낸 데이터를 꺼냅니다.
+      const { profile, mediaList } = response.data;
+      const dbData = profile || response.data.idolProfile || response.data;
+      
+      
+      // IdolProfile.js 이미지 렌더링 부분
+      const isValidFileName = (fileName) => {
+        if (!fileName) return false;
+        // 한글이 포함되어 있는지 체크하는 정규식
+        const koreanRegex = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
+        return !koreanRegex.test(fileName);
+      };
+      // 3. 데이터가 있고, 그 안에 이름(name) 필드가 있는지 체크
+      if (dbData && (dbData.name || dbData.idolName)) { 
+        setIdol(prev => ({
+          ...prev,
+          profile: {
+            ...prev.profile,
+            name: dbData.name || dbData.idolName,
+            nameEn: dbData.nameEn || prev.profile.nameEn,
+            birth: dbData.birth || prev.profile.birth,
+            height: dbData.height || prev.profile.height,
+            mbti: dbData.mbti || prev.profile.mbti,
+            hobby: dbData.hobby || prev.profile.hobby,
+            keyword: dbData.keyword || prev.profile.keyword,
+            mainImgUrl: dbData.mainImgUrl || prev.profile.mainImgUrl,
+            votes: { 
+              rank: dbData.rank || "-", 
+              current: dbData.voteCount || 0 
+            },
+          },
+         photos: mediaList ? mediaList.map(m => ({
+              // 서버가 보내주는 실제 데이터 구조를 console.log(mediaList)로 꼭 확인하세요!
+              id: m.mediaId || m.MEDIAID || m.id || m.ID,
+              url: m.url || m.URL || m.fileName || m.FILENAME, 
+              desc: m.description || m.DESCRIPTION || ""
+          })) : [],
+          
+        }));
+        console.log("✅ 상태 업데이트 성공!");
+      } 
+      else {
+        console.error("❌ 서버에서 빈 데이터를 보냈습니다. DB를 확인하세요.");
+      }
+
+      // 비디오 정보 불러오기
+      const res = await getVideoPageApi(
+            {
+              page : 1,
+              size : 4,
+              sortType : "LATEST", 
+              search : dbData.name,
+              searchType : "NAME",
+              deletedFlag : "N"
+            }
+      );
+
+      const data = await res.data.list;
+
+      // 더이상 불러올 자료 없음
+      if (!Array.isArray(data)) {
+           return;
+      }      
+
+      setIdol(prev => ({
+          ...prev,
+          profile: {
+            ...prev.profile,
+            name: dbData.name || dbData.idolName,
+            nameEn: dbData.nameEn || prev.profile.nameEn,
+            birth: dbData.birth || prev.profile.birth,
+            height: dbData.height || prev.profile.height,
+            mbti: dbData.mbti || prev.profile.mbti,
+            hobby: dbData.hobby || prev.profile.hobby,
+            keyword: dbData.keyword || prev.profile.keyword,
+            mainImgUrl: dbData.mainImgUrl || prev.profile.mainImgUrl,
+            votes: { 
+              rank: dbData.rank || "-", 
+              current: dbData.voteCount || 0 
+            },
+          },
+         photos: mediaList ? mediaList.map(m => ({
+              // 서버가 보내주는 실제 데이터 구조를 console.log(mediaList)로 꼭 확인하세요!
+              id: m.mediaId || m.MEDIAID || m.id || m.ID,
+              url: m.url || m.URL || m.fileName || m.FILENAME, 
+              desc: m.description || m.DESCRIPTION || ""
+          })) : [],
+          
+      }));
+
+
+
+
+
+
+
+    } catch (err) {
+      console.error("❌ API 호출 자체 실패:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+fetchIdolData();
+}, [id])
+
+  if (loading) return <div style={{color: 'white', padding: '20px'}}>데이터 연결 중...</div>;
+
+  return (
+    <div className="id-wrap">
+      <div className="id-back-bar">
+        <button className="id-back-btn" onClick={() => navigate(-1)}>
+          ← 참가자 목록으로 돌아가기
+        </button>
+      </div>
+
+      <div className="id-top-content">
+        <div className="id-left-area">
+          <div className="id-profile-section">
+            <div className="id-p-img">
+              <img 
+                // key를 주면 주소가 바뀔 때 이미지를 아예 새로 갈아 끼웁니다.
+                key={idol.profile.mainImgUrl || 'default'} 
+                src={idol.profile.mainImgUrl && idol.profile.mainImgUrl !== "default_profile.png"
+                ? `http://localhost:8181/profile/${idol.profile.mainImgUrl.replace(/^\//, "")}`
+                : "/default_profile.png"
+              }
+                alt="profile"
+                onError={(e) => {
+                  e.target.onerror = null; // 무한 루프 방지
+                  e.target.src = "/default_profile.png";
+                }}
+              />
+            </div>
+
+            <div className="id-p-info">
+              {/* ✅ 이름과 버튼을 감싸는 행 */}
+              <div className="id-p-name-row">
+                {/* 왼쪽: 국문/영문 이름 묶음 */}
+                <div className="id-name-group">
+                  <h2>{idol.profile.name}</h2>
+                  <span>{idol.profile.nameEn}</span>
+                </div>
+
+                {/* 오른쪽: 공유 버튼 묶음 */}
+                <div className="id-p-share">
+                  <button>𝕏</button> 
+                  <button>공유</button>
+                </div>
+              </div>
+              <table className="id-info-table">
+                <tbody>
+                  {[
+                    ["생년월일", idol.profile.birth],
+                    ["키", `${idol.profile.height}cm`],
+                    ["MBTI", idol.profile.mbti],
+                    ["취미", idol.profile.hobby],
+                    ["나를 나타내는 키워드", idol.profile.keyword],
+                  ].map(([label, val]) => (
+                    <tr key={label}>
+                      <th>{label}</th>
+                      <td>{val}</td>
+                    </tr>
+                  ))}
+
+
+                  {/* ✅ user가 존재하고(로그인 상태), role이 'ADMIN'일 때만 렌더링 */}
+                  {user && (
+                    <tr>
+                      <td colSpan="2">
+                        <div className="id-btn-row">
+                          <label htmlFor="tempUpload" className="id-btn-upload">
+                            <span className="id-btn-icon">📁</span> 사진 등록
+                          </label>
+                          <input 
+                            type="file" 
+                            id="tempUpload" 
+                            style={{ display: 'none' }} 
+                            onChange={handleImageUpload} 
+                          />
+                          {idol.profile.mainImgUrl && (
+                            <button onClick={handleImageDelete} className="id-btn-delete">
+                              <span>🗑️</span> 사진 삭제
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+
+                  </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="id-photo-section">
+            <h4 className="id-sec-title">사진</h4>
+            <div className="id-photo-grid">
+                {idol.photos.length > 0 ? (
+                  idol.photos.map((p) => (
+                    <div key={p.id} className="id-photo-item">
+                      <img 
+                        /* 1. 경로 확인: 서버에서 '1.jpg'라고 온다면 /images/1.jpg가 되어야 함 */
+                        src={p.url.startsWith('http') ? p.url : `http://localhost:8181/images/${p.url.replace(/^\//, "")}`} 
+                        alt={p.desc} 
+                        onError={(e) => {
+                          e.target.onerror = null; 
+                          e.target.src = "/default_profile.png"; // 실패 시 대체 이미지
+                        }}
+                      />
+                      {p.desc && <div className="id-photo-overlay">{p.desc}</div>}
+                    </div>
+                  ))
+                ) : (
+                  <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>등록된 사진이 없습니다.</p>
+                )}
+              </div>
+          </div>
+        </div>
+
+        <div className="id-side-bar">
+          
+          
+          <div className="id-vote-card">
+            <div className="id-v-stat">
+              <strong>{idol.profile.votes.rank}위</strong>
+              <span>현재 순위</span>
+            </div>
+            <div className="id-v-stat">
+              <strong>{idol.profile.votes.current.toLocaleString()}</strong>
+              <span>득표수</span>
+            </div>
+          </div>
+
+          <button className="id-btn-sub">투표 하러가기</button>
+          <button className="id-btn-sub">굿즈 보러가기</button>
+          <button 
+          className="id-btn-sponsor" 
+          onClick={() => navigate(`/support/${id}`)}
+        >
+          후원하기
+        </button>
+
+          <ChatRoom />
+
+          <div className="id-calendar-room">
+            <h4 className="id-chat-title">아이돌 스케줄</h4>
+            <div className="id-calendar-box">
+              <p>2026. 03</p>
+              <small>스케줄 로딩 중...</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="id-bottom-content">
+        <h4 className="id-sec-title">관련 영상 및 사진</h4>
+        <div className="id-video-grid">
+          {idol.videos.map(v => (
+            <div key={v.id} className="id-video-item">
+              <div className="id-v-thumb">
+                <img src={v.thumb} alt={v.title} />
+                <div className="id-v-play">▶</div>
+              </div>
+              <div className="id-v-body">
+                <p>{v.title}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}

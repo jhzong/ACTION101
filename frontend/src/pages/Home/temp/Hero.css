@@ -1,0 +1,193 @@
+.hero {
+  position: relative;
+  /* height: 100vh; */
+  /* background: linear-gradient(135deg, #0a1f2f, #0d2b3f); */
+  /* display: flex; */
+  /* align-items: center; */
+  /* justify-content: center; */
+  color: white;
+  overflow: hidden;
+}
+
+.overlay {
+  position: absolute;
+  width: 100%;
+  /* height: 100%; */
+  /* background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.6)); */
+}
+
+.content {
+  text-align: center;
+  z-index: 2;
+  max-width: 900px;
+}
+
+.watermark {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 160px;
+  opacity: 0.05;
+  font-weight: bold;
+  letter-spacing: 10px;
+}
+
+.subTitle {
+  color: #00eaff;
+  letter-spacing: 4px;
+  /* margin-bottom: 10px; */
+}
+
+.title {
+  font-size: 48px;
+  font-weight: 700;
+  /* margin-bottom: 20px; */
+}
+
+.title span {
+  color: #00eaff;
+}
+
+.desc {
+  opacity: 0.8;
+  /* margin-bottom: 30px; */
+}
+
+.deadline {
+  /* margin-bottom: 15px; */
+  opacity: 0.7;
+}
+
+.timer {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 40px;
+}
+
+.timeBox {
+  background: rgba(0, 255, 255, 0.08);
+  padding: 15px 20px;
+  border-radius: 12px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  transition: 0.2s;
+}
+
+.timeBox:hover {
+  transform: scale(1.05);
+}
+
+.num {
+  font-size: 28px;
+  color: #00eaff;
+  display: block;
+}
+
+.label {
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.primary {
+  background: linear-gradient(135deg, #00f0ff, #00c6ff);
+  border: none;
+  padding: 12px 30px;
+  border-radius: 30px;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+  transition: 0.2s;
+}
+
+.primary:hover {
+  transform: scale(1.05);
+}
+
+button {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.3);
+  padding: 12px 30px;
+  border-radius: 30px;
+  color: white;
+  cursor: pointer;
+}
+
+.secondary:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.logoWrap {
+  position: relative;
+  width: 300px;
+  margin: 0 auto;
+  animation: float 3s ease-in-out infinite;
+}
+
+.logo {
+  width: 100%;
+  display: block;
+  filter: drop-shadow(0 15px 30px rgba(0,0,0,0.7))
+    contrast(1.1)
+    brightness(0.95);
+}
+
+/* 교차하는 샤프한 레이저 빔 1 */
+.content::after {
+  content: '';
+  position: absolute;
+  bottom: -20%;
+  left: 10%;
+  width: 100vw;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+  transform: rotate(-35deg);
+  box-shadow: 0 0 30px var(--neon-blue);
+  opacity: 0.4;
+  animation: laser-move-1 8s infinite linear;
+}
+
+/* 교차하는 샤프한 레이저 빔 2 */
+.content-extra {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+}
+.content-extra::before {
+  content: '';
+  position: absolute;
+  bottom: -20%;
+  right: 10%;
+  width: 100vw;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ffffff, transparent);
+  transform: rotate(35deg);
+  box-shadow: 0 0 30px #ffffff;
+  opacity: 0.3;
+  animation: laser-move-2 10s infinite linear;
+}
+
+@keyframes main-spotlight {
+  0%, 100% { transform: translateX(-50%) rotate(-3deg); opacity: 0.7; }
+  50% { transform: translateX(-50%) rotate(3deg); opacity: 1; }
+}
+
+@keyframes laser-move-1 {
+  0% { transform: translateY(0) rotate(-35deg); }
+  50% { transform: translateY(-200px) rotate(-30deg); }
+  100% { transform: translateY(0) rotate(-35deg); }
+}
+
+@keyframes laser-move-2 {
+  0% { transform: translateY(0) rotate(35deg); }
+  50% { transform: translateY(-150px) rotate(40deg); }
+  100% { transform: translateY(0) rotate(35deg); }
+}
+/*-----------------------------------------------------------------------------------*/

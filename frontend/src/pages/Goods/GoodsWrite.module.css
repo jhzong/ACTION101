@@ -1,0 +1,279 @@
+/* 헤더: 구분선을 더 은은하게 */
+/* 헤더 전체 컨테이너: 아래 .container와 너비 맞춤 */
+.header {
+  width: 100%;
+  max-width: 850px; /* .container와 동일하게 설정 */
+  margin: 0 auto; /* 중앙 정렬 및 아래 컨테이너와의 간격 */
+  box-sizing: border-box;
+}
+
+.title {
+  /*font-size: 2.2rem;*/
+  color: #e8f4f8;
+  /*font-weight: 800;*/
+  margin-bottom: 20px;
+  letter-spacing: -0.01em;
+  /* 타이틀 아래 강조 선 */
+  display: inline-block; 
+  position: relative;
+  padding-bottom: 20px;
+}
+
+/* 타이틀 아래 짧고 굵은 포인트 선 (선택 사항) */
+.title::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 850px;
+  height: 1px;
+  background: #00f2ff;
+  border-radius: 2px;
+}
+
+/* 헤더 섹션 자체의 구분선 (전체 너비) */
+.headerDivider {
+  width: 100%;
+  height: 1px;
+  background: rgba(0, 242, 255, 0.15);
+  margin-bottom: 30px;
+}
+
+.infoBox {
+  background: rgba(0, 242, 255, 0.03);
+  border: 1px solid rgba(0, 242, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px; /* 구분선 위 여백 */
+  max-width: 850px;
+}
+
+.infoTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: #00f2ff;
+    margin-bottom: 10px;
+}
+
+.infoList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.infoList li {
+    font-size: 13px;
+    color: rgba(232, 244, 248, 0.7);
+    line-height: 1.6;
+    position: relative;
+    padding-left: 15px;
+}
+
+.infoList li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #00f2ff;
+}
+
+/* 박스 크기를 200px로 엄격하게 고정 */
+/* 컨테이너 크기 고정 */
+.imagePreviewContainer {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.imageLabel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    border: 2px dashed rgba(0, 242, 255, 0.2);
+    border-radius: 12px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: 0.3s;
+}
+
+.imageLabel:hover {
+    border-color: #00f2ff;
+}
+
+.imageWrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.imageWrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 캡션: 그라데이션 제거, 단색 반투명 블랙 */
+.imageOverlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.6); 
+    
+    color: #e8f4f8; 
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+    padding: 8px 0;
+    
+    /* 과한 네온 효과 제거 */
+    opacity: 0;
+    transition: 0.2s ease;
+    pointer-events: none;
+}
+
+/* 호버 시 부드럽게 표시 */
+.imageLabel:hover .imageOverlay {
+    opacity: 1;
+}
+
+/* X 버튼 스타일 */
+.imageDeleteBadge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    background: #ff4d4d;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.imagePlaceholder {
+    text-align: center;
+    color: rgba(232, 244, 248, 0.4);
+}
+
+.hiddenInput { display: none; }
+
+.fullWidth {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* 필수 항목 별표 스타일 */
+.required {
+    color: #ff4d4d;
+    margin-left: 4px;
+    font-weight: bold;
+    font-size: 1.1em; /* 별표가 너무 작아 보이면 크기 조절 */
+}
+
+/* 수정 불가 라벨용 보조 텍스트 */
+.readOnlyNote {
+    color: #ff4d4d; /* 별표(*)와 톤을 맞춘 레드 */
+    margin-left: 3px;
+    font-weight: 500;
+}
+
+.readOnlyInputText {
+    color: #ff4d4d !important;
+    font-weight: bold;
+}
+
+/* 기존 input:read-only를 아래와 같이 클래스명으로 변경 */
+.readOnlyInput {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: #999 !important;
+    cursor: not-allowed !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.readOnlyInput:disabled {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: #999 !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    cursor: not-allowed !important;
+    pointer-events: auto !important;
+}
+
+.wrapper {
+  min-height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0px 20px;
+}
+
+.container {
+  width: 100%;
+  max-width: 850px;
+  /* 로그인 폼 카드와 동일한 배경 및 테두리 */
+  background: rgba(0, 242, 255, 0.03); 
+  border: 1px solid var(--border-color, rgba(0, 242, 255, 0.15));
+  border-radius: 20px;
+  padding: 50px 40px;
+  box-sizing: border-box;
+}
+
+.formGroup {
+  margin-bottom: 28px;
+}
+
+/* 라벨 스타일: 네온 효과 제거, 로그인 폼 라벨 톤으로 변경 */
+.label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(232, 244, 248, 0.55); /* 차분한 톤 */
+  margin-bottom: 10px;
+  letter-spacing: 0.5px;
+}
+
+/* 버튼 영역 */
+.btnWrapper {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 40px;
+}
+.textarea {
+    width: 100%;
+    min-height: 120px;
+    max-height: 200px;
+    resize: none; /* 핵심: 크기 고정 */
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(0, 242, 255, 0.2);
+    border-radius: 8px;
+    color: #fff;
+    line-height: 1.4;
+}
+.textarea::-webkit-scrollbar {
+    width: 6px;
+}
+
+.textarea::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.textarea::-webkit-scrollbar-thumb {
+    background: rgba(0, 242, 255, 0.5);
+    border-radius: 10px;
+}
+
+.textarea::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 242, 255, 0.8);
+}
